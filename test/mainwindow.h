@@ -19,8 +19,8 @@ public:
 
 private slots:
     void on_ExitButton_clicked();
-
     void on_Login_clicked();
+    void onServerResponse();
 
 private:
     Ui::MainWindow *ui;

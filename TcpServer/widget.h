@@ -7,7 +7,9 @@
 #include <QHostAddress>
 #include <mythread.h>
 #include <QByteArray>
-
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
 #define PORT 12345
 
 QT_BEGIN_NAMESPACE
@@ -25,9 +27,13 @@ public:
 private slots:
     void newClientHandler();
     void threadRead(QByteArray);
+    void clientDisconnected();
 
 private:
     Ui::Widget *ui;
     QTcpServer *server;
-};
+    QTcpSocket *SendSocket;
+    QList <QTcpSocket*> ClientsocketList; // 用来存储socket的list
+
+ };
 #endif // WIDGET_H

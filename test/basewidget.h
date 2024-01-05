@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <mainwindow.h>
 #include <QByteArray>
+#include<QDateTime>
 
 namespace Ui {
 class BaseWidget;
@@ -21,9 +22,7 @@ public:
 
 private slots:
     void on_ClearBtn_clicked();
-
     void on_SendBtn_clicked();
-
     void on_ClearDataBtn_clicked();
 
 private:
