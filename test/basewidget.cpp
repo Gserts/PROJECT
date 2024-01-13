@@ -13,8 +13,9 @@ BaseWidget::BaseWidget(QTcpSocket *s,QWidget *parent) :
 
     connect(socket,&QTcpSocket::disconnected,[this]()
             {
-                QMessageBox::warning(this,"警告","连接断开");
                 this->close();
+                QMessageBox::warning(this,"警告","连接断开");
+
             }
             );
 

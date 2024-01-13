@@ -19,6 +19,7 @@ QT_END_NAMESPACE
 class Widget : public QWidget
 {
     Q_OBJECT
+    QMap<QTcpSocket*, bool> clientLoggedIn;
 
 public:
     Widget(QWidget *parent = nullptr);
@@ -28,7 +29,7 @@ private slots:
     void newClientHandler();
     void threadRead(QByteArray);
     void clientDisconnected();
-
+    void readyRead();
 private:
     Ui::Widget *ui;
     QTcpServer *server;

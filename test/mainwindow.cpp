@@ -29,38 +29,22 @@ void MainWindow::onServerResponse() {
         w->show(); // 显示新界面
     } else if (response == "Failed") {
         QMessageBox::warning(this, "登录失败", "用户名或密码错误");
-        this->show(); // 显示登录界面
+    }else{
+        QMessageBox::warning(this, "错误", "未知错误");
     }
 }
 
 
-void MainWindow::on_ExitButton_clicked()
+void MainWindow::on_ExitButton_clicked()//退出窗口
 {
     this->close();
 }
 
 void MainWindow::on_Login_clicked()
 {
-    const QString name = ui->NameLineEdit->text();
-    const QString password = ui->PasswordLineEdit->text();
-
-    QString IP = "127.0.0.1";  // 服务器IP
-    quint16 port = 12345;       // 服务器端口
-    socket = new QTcpSocket(this);  // 初始化socket
-
-    // 连接到服务器
-    socket->connectToHost(QHostAddress(IP), port);
-
-    // 连接成功时发送数据
-    connect(socket, &QTcpSocket::connected, [this, name, password]() {
-        QByteArray dataToSend;
-        QDataStream out(&dataToSend, QIODevice::WriteOnly);
-        out << name << password;
-        socket->write(dataToSend);
-        socket->waitForBytesWritten();
-    });
-
-    // 连接 readyRead 信号以接收服务器响应
+    QString l="LOGIN";
+    Connect(l);//处理连接
+    // 连接 readyRead 信号以接收服务器响应，回应Success则进入，Failed则返回错误
     connect(socket, &QTcpSocket::readyRead, this, &MainWindow::onServerResponse);
 
     // 处理连接异常
@@ -71,7 +55,37 @@ void MainWindow::on_Login_clicked()
     });
 }
 
+void MainWindow::Connect(const QString &type){ //登陆或者注册使用的初始化连接
+    const QString name = ui->NameLineEdit->text();
+    const QString password = ui->PasswordLineEdit->text();
+    qDebug()<<type;
+    socket = new QTcpSocket(this);  // 初始化socket
+    // 连接到服务器
+    socket->connectToHost(QHostAddress(IP), port);
+    // 连接成功时发送数据
+    connect(socket, &QTcpSocket::connected, [this, type, name, password]() {
+        QByteArray dataToSend;
+        QDataStream out(&dataToSend, QIODevice::WriteOnly);
+        out << type<< name << password;
+        socket->write(dataToSend);
+        socket->waitForBytesWritten();
+    });
+}
 
+void MainWindow::regResponse(){
+    QByteArray response=socket->readAll();
+    if(response=="Success"){
+        QMessageBox::information(this,"信息","注册成功");
+    }else if(response == "Failed"){
+        QMessageBox::information(this,"问题","注册失败，请检查帐号是否已经存在");
+    }
+}
 
+void MainWindow::on_reg_clicked()
+{
+    QString r="REGISTER";
+    Connect(r);
+    connect(socket, &QTcpSocket::readyRead,this,&MainWindow::regResponse);
 
+}
 

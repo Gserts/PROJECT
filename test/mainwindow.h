@@ -20,10 +20,15 @@ public:
 private slots:
     void on_ExitButton_clicked();
     void on_Login_clicked();
-    void onServerResponse();
+    void onServerResponse();//登陆回应
+    void regResponse();//注册回应
+    void Connect(const QString &str);
+    void on_reg_clicked();
 
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
+    QString IP = "127.0.0.1";  // 服务器IP
+    quint16 port = 12345;       // 服务器端口
 };
 #endif // MAINWINDOW_H
