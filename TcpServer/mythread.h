@@ -17,6 +17,7 @@ public:
     explicit MyThread(QTcpSocket *s);
     void run(); //虚函数，需要重写
 
+
 signals:
     void sendMsg(QByteArray);
 

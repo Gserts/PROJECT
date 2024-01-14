@@ -10,15 +10,18 @@ CONFIG += c++17
 
 SOURCES += \
     basewidget.cpp \
+    flist.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     basewidget.h \
+    flist.h \
     mainwindow.h
 
 FORMS += \
     basewidget.ui \
+    flist.ui \
     mainwindow.ui
 
 TRANSLATIONS += \

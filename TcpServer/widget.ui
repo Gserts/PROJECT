@@ -13,100 +13,35 @@
   <property name="windowTitle">
    <string>Server</string>
   </property>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>38</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;server&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="ShowIP">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>20</y>
-     <width>125</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>20</y>
-     <width>25</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>port</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="ShowPort">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>20</y>
-     <width>125</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>20</y>
-     <width>559</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>559</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;IP&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-  </widget>
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>60</y>
      <width>256</width>
-     <height>192</height>
+     <height>351</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>420</x>
      <y>260</y>
      <width>101</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>接入IP列表</string>
+    <string>接入用户列表</string>
    </property>
   </widget>
   <widget class="QListWidget" name="infoList">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>345</x>
      <y>60</y>
-     <width>256</width>
+     <width>221</width>
      <height>192</height>
     </rect>
    </property>
@@ -114,14 +49,14 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>260</y>
+     <x>140</x>
+     <y>420</y>
      <width>58</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>信息</string>
+    <string>日志</string>
    </property>
   </widget>
  </widget>

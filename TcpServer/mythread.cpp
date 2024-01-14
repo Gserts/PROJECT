@@ -10,6 +10,7 @@ MyThread::MyThread(QTcpSocket *s)
 void MyThread::run()
 {
     connect(socket,&QTcpSocket::readyRead,this,&MyThread::ClientInfoSlot);
+    exec();
 }
 
 void MyThread::ClientInfoSlot(){

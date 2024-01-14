@@ -5,6 +5,7 @@ Widget::Widget(QWidget *parent)//构造函数，
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
+
     ui->setupUi(this);
     server = new QTcpServer;
 
@@ -14,10 +15,11 @@ Widget::Widget(QWidget *parent)//构造函数，
 
     //连接到数据库，注意这里以后需要修改！！！！！！！！！！！！！！！！！！！！！！！！
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost"); // 或您的数据库服务器地址
-    db.setDatabaseName("userinfo");
-    db.setUserName("root"); // 数据库用户名
-    db.setPassword("85621362"); // 数据库密码
+    db.setHostName(DB_Server); // 或您的数据库服务器地址
+    db.setDatabaseName(UserInfoTable);
+    db.setUserName(DB_USR); // 数据库用户名
+    db.setPassword(DB_PWD); // 数据库密码
+    db.setPort(28890);
     if (!db.open()) {
         qDebug() << "Database connection failed:" << db.lastError().text();
     } else {
@@ -31,31 +33,28 @@ Widget::~Widget()
     delete ui;
 }
 
-
 void Widget::clientDisconnected(){ //用户断开方法
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
     if (socket) {
         // 从列表中移除套接字
         clientLoggedIn[socket]=false; //登陆状态更改
-        QList<QListWidgetItem*> items= ui->infoList->findItems(socket->peerAddress().toString(),Qt::MatchExactly);
+        QList<QListWidgetItem*> items= ui->infoList->findItems(socket->peerAddress().toString(),Qt::MatchContains);
         if(!items.isEmpty()){
             delete ui->infoList->takeItem(ui->infoList->row(items.first())); //在列表中删除
         }
-
         ClientsocketList.removeAll(socket);
         socket->deleteLater();  // 确保安全地删除套接字
-
-        // 从界面上移除 IP 地址
-        // 这里需要您根据自己的界面设计来编写代码，例如更新一个列表控件
-        // ui->InfoList->removeItem(...)  // 伪代码，根据实际情况修改********************
-
-
         // 打印或记录日志
         qDebug() << "Client disconnected: " << socket->peerAddress().toString();
+
+        MyThread* thread = socketThreadMap.take(socket); // 从映射中移除线程
+        if (thread) {
+            thread->quit();
+            thread->wait();
+            thread->deleteLater();
+        }
     }
 }
-
-
 
 void Widget::newClientHandler()
 {
@@ -68,12 +67,15 @@ void Widget::newClientHandler()
     clientLoggedIn[socket]=false;
     connect(socket,&QTcpSocket::readyRead,this,&Widget::readyRead);
     //读取socket中存储的用户名和密码，同时清空socket
+    connect(socket,&QTcpSocket::disconnected,this,&Widget::clientDisconnected);
+    //如果连接成功，那么服务器列表显示连接IP
 
+}
     //数据库的查询，userinfo是要查询的表
     //-------------------------------------
 
 
-}
+
 
 void Widget::readyRead(){
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
@@ -84,11 +86,10 @@ void Widget::readyRead(){
         return; // 如果数据不够，等待更多数据
     }
 
-    QByteArray data = socket->readAll();
-    QDataStream in(&data, QIODevice::ReadOnly);
-
     // 进行数据处理
     if(!clientLoggedIn[socket]){
+        QByteArray data = socket->readAll();
+        QDataStream in(&data, QIODevice::ReadOnly);
         QString type, username, password;
         in >> type >> username >> password;
         if(type == "LOGIN"){
@@ -109,7 +110,12 @@ void Widget::readyRead(){
             }
             socket->write(response);
             clientLoggedIn[socket]=true;
-            qDebug()<<"切换登陆状态";  //截止到这里不可以
+
+            QString clientIP= socket->peerAddress().toString();
+
+            ui->infoList->addItem("IP&端口:"+clientIP+":"+QString::number(socket->peerPort())+" 用户:"+username);
+            //列表更新
+            qDebug()<<"登陆状态:"<<clientLoggedIn[socket];
             //确定为登陆状态
 
         }else if(type == "REGISTER"){
@@ -141,11 +147,17 @@ void Widget::readyRead(){
 
         }
     }else {
-        MyThread * t= new MyThread(socket);
-        t->QThread::start();  //开启线程
-        ui->textBrowser->setText("线程启动");
-        connect(t,&MyThread::sendMsg,this,&Widget::threadRead);
-        connect(socket,&QTcpSocket::disconnected,this,&Widget::clientDisconnected);
+
+        MyThread* thread = socketThreadMap.value(socket, nullptr);
+        if (!thread) {
+            thread = new MyThread(socket);
+            thread->start();// 将线程存储在映射中
+            connect(thread, &MyThread::finished, thread, &QObject::deleteLater);
+            connect(thread, &MyThread::sendMsg, this, &Widget::threadRead,Qt::QueuedConnection);
+            socketThreadMap.insert(socket, thread);
+        }
+
+        // 此处可以添加代码来处理已登录的socket，例如将数据传递给线程
     }
 }
 
@@ -157,6 +169,7 @@ void Widget::readyRead(){
 void Widget::threadRead(QByteArray ReciData)
 {
     ui->textBrowser->append(QString::fromUtf8(ReciData)); //设置text
+
     qDebug()<<"信息发送";
 }
 

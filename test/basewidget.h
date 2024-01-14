@@ -7,6 +7,7 @@
 #include <mainwindow.h>
 #include <QByteArray>
 #include<QDateTime>
+#include <flist.h>
 
 namespace Ui {
 class BaseWidget;
@@ -17,18 +18,30 @@ class BaseWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit BaseWidget(QTcpSocket *s,QWidget *parent = nullptr);
+    explicit BaseWidget(QTcpSocket *s,const QString &name,QWidget *parent = nullptr);
     ~BaseWidget();
+
+signals:
+        void signalClose();
 
 private slots:
     void on_ClearBtn_clicked();
     void on_SendBtn_clicked();
     void on_ClearDataBtn_clicked();
 
+    void on_friendBtn_clicked();
+
+protected:
+    void closeEvent(QCloseEvent *event) override{
+        emit signalClose();
+        QWidget::closeEvent(event);
+    }
+
 private:
     Ui::BaseWidget *ui;
     Ui::MainWindow *lgui;
     QTcpSocket *socket;
+    QString name;
 };
 
 #endif // BASEWIDGET_H

@@ -19,7 +19,7 @@ QT_END_NAMESPACE
 class Widget : public QWidget
 {
     Q_OBJECT
-    QMap<QTcpSocket*, bool> clientLoggedIn;
+    QMap<QTcpSocket*, bool> clientLoggedIn; //登陆状态检测
 
 public:
     Widget(QWidget *parent = nullptr);
@@ -35,6 +35,10 @@ private:
     QTcpServer *server;
     QTcpSocket *SendSocket;
     QList <QTcpSocket*> ClientsocketList; // 用来存储socket的list
-
+    QString DB_Server="gz-cynosdbmysql-grp-233inxoz.sql.tencentcdb.com",
+        UserInfoTable="Base1",
+        DB_PWD="Zsc85621362",
+        DB_USR="root";
+    QMap<QTcpSocket*, MyThread*> socketThreadMap;
  };
 #endif // WIDGET_H
