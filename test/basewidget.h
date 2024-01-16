@@ -28,7 +28,7 @@ private slots:
     void on_ClearBtn_clicked();
     void on_SendBtn_clicked();
     void on_ClearDataBtn_clicked();
-
+    void onReadyRead();
     void on_friendBtn_clicked();
 
 protected:
@@ -42,6 +42,7 @@ private:
     Ui::MainWindow *lgui;
     QTcpSocket *socket;
     QString name;
+    QString type,to_id;//窗口聊天类型，对象id
 };
 
 #endif // BASEWIDGET_H

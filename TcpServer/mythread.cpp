@@ -16,8 +16,16 @@ void MyThread::run()
 void MyThread::ClientInfoSlot(){
 
     //目前到这一步没问题
-    QByteArray d=socket->readAll();  //这里出错，这是一个流，请不要重复读取，否则在后面值会为空
+    QByteArray data=socket->readAll();  //这里出错，这是一个流，请不要重复读取，否则在后面值会为空
+    QDataStream in(&data,QIODevice::ReadOnly);
+    QString type,from_id,to_id,time,content;
+    in>>type>>from_id>>to_id>>time>>content;
 
-    emit sendMsg(d);
+    if(type =="private"){//如果是私聊
+        emit sendTarget(type,from_id,to_id,time,content);
+        //QTcpSocket* toSocket = usrMAPsocket ，首先找到对应的socket，然后再发送内容到socket里面
+    }
+
+    emit sendMsg(type,from_id,to_id,time,content);
     //注意，不可以在其他类里面操作界面，因此，需要用到自定义槽函数。这里暂时只能debug
 }

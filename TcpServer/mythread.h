@@ -19,7 +19,16 @@ public:
 
 
 signals:
-    void sendMsg(QByteArray);
+    void sendMsg(const QString & type,
+                 const QString &from_id,
+                 const QString &to_id,
+                 const QString & time,
+                 const QString& content);
+    void sendTarget(const QString & type,
+                      const QString &from_id,
+                      const QString &to_id,
+                      const QString & time,
+                      const QString& content);
 
 public slots:
     void ClientInfoSlot();

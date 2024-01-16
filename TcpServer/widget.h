@@ -25,11 +25,20 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+    void usrMAPsocket(const QString& usr,QTcpSocket * s){
+        usrMapSocket[usr]=s;
+    }
+
 private slots:
     void newClientHandler();
-    void threadRead(QByteArray);
+    void threadRead(QString,QString,QString,QString,QString);
     void clientDisconnected();
     void readyRead();
+    void conveyToTarget(const QString& type,
+                        const QString& from_id,
+                        const QString& to_id,
+                        const QString& time,
+                        const QString& content);
 private:
     Ui::Widget *ui;
     QTcpServer *server;
@@ -40,5 +49,7 @@ private:
         DB_PWD="Zsc85621362",
         DB_USR="root";
     QMap<QTcpSocket*, MyThread*> socketThreadMap;
+    QMap<QString, QTcpSocket*> usrMapSocket;    ;
+
  };
 #endif // WIDGET_H

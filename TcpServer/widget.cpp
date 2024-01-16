@@ -110,13 +110,13 @@ void Widget::readyRead(){
             }
             socket->write(response);
             clientLoggedIn[socket]=true;
-
             QString clientIP= socket->peerAddress().toString();
-
             ui->infoList->addItem("IP&端口:"+clientIP+":"+QString::number(socket->peerPort())+" 用户:"+username);
             //列表更新
             qDebug()<<"登陆状态:"<<clientLoggedIn[socket];
             //确定为登陆状态
+            //映射名字与socket
+            usrMAPsocket(username,socket);
 
         }else if(type == "REGISTER"){
             qDebug()<<"用户注册";
@@ -147,16 +147,19 @@ void Widget::readyRead(){
 
         }
     }else {
-
+        //这里寻找socket对应的线程，如果有，则令thread为此线程，若无，则进入新建线程。
         MyThread* thread = socketThreadMap.value(socket, nullptr);
         if (!thread) {
             thread = new MyThread(socket);
-            thread->start();// 将线程存储在映射中
-            connect(thread, &MyThread::finished, thread, &QObject::deleteLater);
-            connect(thread, &MyThread::sendMsg, this, &Widget::threadRead,Qt::QueuedConnection);
-            socketThreadMap.insert(socket, thread);
-        }
 
+            connect(thread, &MyThread::finished, thread, &QObject::deleteLater);
+            connect(thread, &MyThread::sendTarget, this, &Widget::threadRead,Qt::QueuedConnection);
+            connect(thread, &MyThread::sendTarget,this, &Widget::conveyToTarget);
+
+            socketThreadMap.insert(socket, thread);
+            thread->start();// 将线程存储在映射中，###############这个代码请勿再更改与槽函数的顺序#################
+        }
+         //发送规格：群or个人、id、时间、内容
         // 此处可以添加代码来处理已登录的socket，例如将数据传递给线程
     }
 }
@@ -166,9 +169,35 @@ void Widget::readyRead(){
 //    ui->textBrowser->setText(QString(s->readAll()));
 //}
 
-void Widget::threadRead(QByteArray ReciData)
+void Widget::conveyToTarget(const QString & type,
+                             const QString &from_id,
+                             const QString &to_id,
+                             const QString & time,
+                            const QString& content){
+    QTcpSocket* toSocket = usrMapSocket.value(to_id,nullptr);
+    if(toSocket){
+        qDebug()<<"检测socket通过，发送至对象";
+        //toSocket->readAll();//清除socket内容
+        QByteArray dataToSend;
+        QDataStream out(&dataToSend, QIODevice::WriteOnly);
+        //这里去除了对象（也就是接受者的id），仅仅保留发送者。
+        out<<type<<from_id<<time<<content;
+        toSocket->write(dataToSend);
+    }else{
+        qDebug()<<"检测对象所对应的socket不存在，发送失败";
+    }
+    //把从服务器读出的内容重新写入，发送给用户的socket中，内容保持一样。
+}
+
+
+
+
+
+void Widget::threadRead(QString type,QString from_id,QString to_id,QString time,QString content)
 {
-    ui->textBrowser->append(QString::fromUtf8(ReciData)); //设置text
+    ui->textBrowser->append(time);
+    ui->textBrowser->append(from_id+" To "+to_id);
+    ui->textBrowser->append(content);    //读取socket中的内容
 
     qDebug()<<"信息发送";
 }
